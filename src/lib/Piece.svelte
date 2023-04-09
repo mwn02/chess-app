@@ -100,15 +100,26 @@
   }
 
   function handlePieceMouseDown(e: MouseEvent) {
-    if (e.button !== 0) return;
     isMoving = true;
     isSelected = true;
+    selectionCount++;
 
     pieceDiv.style.left = `${e.clientX - $store_sqrSize / 2}px`;
     pieceDiv.style.top = `${e.clientY - $store_sqrSize / 2}px`;
     pieceDiv.style.cursor = "grabbing";
     pieceDiv.style.zIndex = "10";
     store_moveOptions.set(moves.filter((m) => m.startSqr === myIndex));
+  }
+
+  function handlePieceMouseUp(e: MouseEvent) {
+    let targetSqr = getHoveredSqrIndex(e.clientX, e.clientY);
+
+    if (targetSqr === myIndex && selectionCount > 1) {
+      isSelected = false;
+      selectionCount = 0;
+      store_moveOptions.set([]);
+      return;
+    }
   }
 
   function handleWindowMouseMove(e: MouseEvent) {
@@ -138,28 +149,23 @@
       return;
     }
 
+    let targetSqr = getHoveredSqrIndex(e.clientX, e.clientY);
+    if (targetSqr === myIndex) {
+      handlePieceMouseDown(e);
+      return;
+    }
+
     if (!isSelected || isWhite !== mainBoardState.isTurnToWhite) return;
 
-    let targetSqr = getHoveredSqrIndex(e.clientX, e.clientY);
-
-    if (targetSqr === myIndex) {
-      selectionCount++;
-
-      if (selectionCount < 2) return;
-    }
-
     isSelected = false;
+    selectionCount = 0;
+    if (isSqrOutOfBound(targetSqr) || !$store_sqrValues[targetSqr].value)
+      store_moveOptions.set(
+        []
+      ); /* dont set to [] if $store_sqrValues[targetSqr].value 
+      because it will empty it after other piece is selected*/
 
     let move: move = { startSqr: myIndex, targetSqr };
-
-    if (
-      isSqrOutOfBound(targetSqr) ||
-      !$store_sqrValues[targetSqr].value ||
-      (selectionCount > 1 && !$store_sqrValues[targetSqr].value)
-    ) {
-      selectionCount = 0;
-      store_moveOptions.set([]);
-    }
 
     attemptMakeMove(move);
   }
@@ -224,7 +230,8 @@
   on:mousemove={handleWindowMouseMove}
   on:mousedown={handleWindowMouseDown}
 />
-<div class="piece" on:mousedown={handlePieceMouseDown} bind:this={pieceDiv} />
+<!-- <div class="piece" on:mousedown={handlePieceMouseDown} bind:this={pieceDiv} /> -->
+<div class="piece" on:mouseup={handlePieceMouseUp} bind:this={pieceDiv} />
 {#if promotion.isPromoting}
   <Promotion
     on:promoted={handlePromotion}
