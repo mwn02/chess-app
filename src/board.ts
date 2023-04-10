@@ -19,14 +19,14 @@ import {
   type gameState,
   type move,
   previousMove,
+  setMoves,
 } from "./move";
+import computer from "./computer";
+import { makeMove } from "./move";
 
 export type sqrValue = { id: number; value: number };
 export const INITIAL_POSITION: string =
   "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
-const INITIAL_POSITION_TEST: string =
-  "nrbqbkrn/pppppppp/8/8/8/8/PPPPPPPP/NRBQBKRN w KQkq - 0 1";
-const KING_TEST_POS: string = "8/7k/8/Q7/8/8/8/K w - 0 1";
 
 export let store_sqrPositions: Writable<number[][]> = writable([]);
 export let store_sqrValues: Writable<sqrValue[]> = writable([]);
@@ -66,7 +66,8 @@ export function loadBoard() {
   previousMove.set(null);
   generateNumSqrsToEdge();
   generateIndexToVector();
-  generateMoves(mainBoardState);
+  let [gameState, moves] = generateMoves(mainBoardState);
+  updateMovesAndGameState(gameState, moves);
   store_sqrValues.set(converNumArrayToSqrValues(mainBoardState.sqrValues));
 }
 
@@ -83,7 +84,16 @@ export function newTurn(
   boardState: BoardState
 ) {
   boardState.isTurnToWhite = !boardState.isTurnToWhite;
-  if (generateNewMoves) store_gameState.set(generateMoves(boardState));
+  if (generateNewMoves) {
+    let [gameState, moves] = generateMoves(boardState);
+    updateMovesAndGameState(gameState, moves);
+    if (!boardState.isTurnToWhite) makeMove(computer.playMove(boardState));
+  }
+}
+
+function updateMovesAndGameState(gameState: gameState, moves: move[]) {
+  store_gameState.set(gameState);
+  setMoves(moves);
 }
 
 export function generateSqrPositions(origin: number[]) {

@@ -28,6 +28,10 @@ export type move = {
   };
 };
 export let moves: move[] = [];
+export function setMoves(_moves: move[]) {
+  moves = structuredClone(_moves);
+}
+
 export type gameState = {
   state: "play" | "end";
   reason: "checkmate" | "stalemate" | "tripleRep" | "50move" | "draw" | "none";
@@ -177,9 +181,10 @@ export function generateIndexToVector() {
   }
 }
 
-export function generateMoves(boardState: BoardState): gameState {
-  if (boardState.fiftyMove > 49) return { state: "end", reason: "50move" };
-  if (hasTripleRepition()) return { state: "end", reason: "tripleRep" };
+export function generateMoves(boardState: BoardState): [gameState, move[]] {
+  if (boardState.fiftyMove > 99)
+    return [{ state: "end", reason: "50move" }, []];
+  if (hasTripleRepition()) return [{ state: "end", reason: "tripleRep" }, []];
 
   let pseudoMoves = generatePseudoMoves(boardState);
   const kingIndex = boardState.sqrValues.findIndex(
@@ -215,15 +220,14 @@ export function generateMoves(boardState: BoardState): gameState {
     }
   }
 
-  moves = pseudoMoves;
-
-  if (moves.length > 0) return { state: "play", reason: "none" };
+  if (pseudoMoves.length > 0)
+    return [{ state: "play", reason: "none" }, pseudoMoves];
 
   let otherBoardState: BoardState = structuredClone(boardState);
   otherBoardState.isTurnToWhite = !otherBoardState.isTurnToWhite;
   if (isKingAttacked(kingIndex, generatePseudoMoves(otherBoardState)))
-    return { state: "end", reason: "50move" };
-  return { state: "end", reason: "stalemate" };
+    return [{ state: "end", reason: "checkmate" }, []];
+  return [{ state: "end", reason: "stalemate" }, []];
 
   function isKingAttacked(
     kingIndex: number,
