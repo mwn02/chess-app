@@ -5,8 +5,8 @@
 
 <main>
   <Board />
-  {#if $store_gameState !== "play"}
-    <div id="checkmate">{$store_gameState.toUpperCase()}!</div>
+  {#if $store_gameState.state !== "play"}
+    <div id="checkmate">{$store_gameState.reason.toUpperCase()}!</div>
     <button on:click={() => loadBoard()}> reset </button>
   {/if}
 </main>
@@ -17,6 +17,7 @@
   0: default
   3: hoveredSqr
   5: moveOption
+  7: promotion
   10: DraggedPiece
  -->
 <style>
