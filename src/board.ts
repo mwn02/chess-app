@@ -32,7 +32,10 @@ export let store_sqrPositions: Writable<number[][]> = writable([]);
 export let store_sqrValues: Writable<sqrValue[]> = writable([]);
 export let store_moveOptions: Writable<move[]> = writable([]);
 export let store_sqrSize: Writable<number> = writable(0);
-export let store_gameState: Writable<gameState> = writable("play");
+export let store_gameState: Writable<gameState> = writable({
+  state: "play",
+  reason: "none",
+});
 
 let charToPiece = {
   k: KING,
@@ -59,7 +62,7 @@ export function loadBoard() {
   mainBoardState.tripleRep = [];
   mainBoardState.fiftyMove = 0;
 
-  loadFEN(INITIAL_POSITION);
+  loadFEN(INITIAL_POSITION, mainBoardState);
   previousMove.set(null);
   generateNumSqrsToEdge();
   generateIndexToVector();
@@ -98,18 +101,18 @@ export function generateSqrPositions(origin: number[]) {
   store_sqrPositions.set(sqrPoses);
 }
 
-export function loadFEN(fen: string) {
-  mainBoardState.sqrValues = new Array().fill(NULL);
+export function loadFEN(fen: string, boardState: BoardState) {
+  boardState.sqrValues = new Array(64).fill(NULL);
   let fenPieces = fen.split(" ")[0];
 
   let isTurnToWhite = fen.split(" ")[1] === "w";
-  mainBoardState.isTurnToWhite = isTurnToWhite;
+  boardState.isTurnToWhite = isTurnToWhite;
 
   let castling = fen.split(" ")[2];
-  mainBoardState.castling.blackKing = castling.includes("k");
-  mainBoardState.castling.blackQueen = castling.includes("q");
-  mainBoardState.castling.whiteKing = castling.includes("K");
-  mainBoardState.castling.whiteQueen = castling.includes("Q");
+  boardState.castling.blackKing = castling.includes("k");
+  boardState.castling.blackQueen = castling.includes("q");
+  boardState.castling.whiteKing = castling.includes("K");
+  boardState.castling.whiteQueen = castling.includes("Q");
 
   let x: number = 0;
   let y: number = 0;
@@ -131,7 +134,7 @@ export function loadFEN(fen: string) {
     let isWhite = pieceChar.toUpperCase() === pieceChar;
     let piece =
       charToPiece[pieceChar.toLowerCase()] + (isWhite ? WHITE : BLACK);
-    mainBoardState.sqrValues[y * 8 + x] = piece;
+    boardState.sqrValues[y * 8 + x] = piece;
 
     x++;
   }

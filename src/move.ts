@@ -28,7 +28,10 @@ export type move = {
   };
 };
 export let moves: move[] = [];
-export type gameState = "play" | "checkmate" | "stalemate";
+export type gameState = {
+  state: "play" | "end";
+  reason: "checkmate" | "stalemate" | "tripleRep" | "50move" | "draw" | "none";
+};
 
 const DIRECTIONS: number[] = [8, -8, 1, -1, 7, -7, 9, -9];
 const KNIGHT_DIRS: number[] = [
@@ -80,7 +83,7 @@ export function makeMove(
 
   function updateTripleRepRule() {
     if (pieceType === PAWN) boardState.tripleRep = [];
-    else boardState.tripleRep.push(boardState.sqrValues);
+    else boardState.tripleRep.push(structuredClone(boardState.sqrValues));
   }
 
   function updateEnPassantState() {
@@ -175,8 +178,8 @@ export function generateIndexToVector() {
 }
 
 export function generateMoves(boardState: BoardState): gameState {
-  if (boardState.fiftyMove > 49) return "stalemate";
-  if (hasTripleRepition()) return "stalemate";
+  if (boardState.fiftyMove > 49) return { state: "end", reason: "50move" };
+  if (hasTripleRepition()) return { state: "end", reason: "tripleRep" };
 
   let pseudoMoves = generatePseudoMoves(boardState);
   const kingIndex = boardState.sqrValues.findIndex(
@@ -214,13 +217,13 @@ export function generateMoves(boardState: BoardState): gameState {
 
   moves = pseudoMoves;
 
-  if (moves.length > 0) return "play";
+  if (moves.length > 0) return { state: "play", reason: "none" };
 
   let otherBoardState: BoardState = structuredClone(boardState);
   otherBoardState.isTurnToWhite = !otherBoardState.isTurnToWhite;
   if (isKingAttacked(kingIndex, generatePseudoMoves(otherBoardState)))
-    return "checkmate";
-  return "stalemate";
+    return { state: "end", reason: "50move" };
+  return { state: "end", reason: "stalemate" };
 
   function isKingAttacked(
     kingIndex: number,
@@ -232,18 +235,12 @@ export function generateMoves(boardState: BoardState): gameState {
   function hasTripleRepition(): boolean {
     let count = 0;
     const sqrValues = boardState.tripleRep[boardState.tripleRep.length - 1];
-    for (let i = 0; i < boardState.tripleRep.length; i++) {
-      console.log("tripleRep @" + i + " -- " + boardState.tripleRep[i]);
-    }
-
-    console.log("intitial sqrValues: " + sqrValues);
 
     for (let i = boardState.tripleRep.length - 3; i >= 0; i -= 2) {
       const otherSqrValues = boardState.tripleRep[i];
-      if (otherSqrValues === sqrValues) {
+      if (sqrValues.every((val, index) => val === otherSqrValues[index]))
         count++;
-        console.log("index: " + i + " sqrValues: " + otherSqrValues);
-      }
+
       if (count > 1) return true;
     }
 
