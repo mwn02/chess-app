@@ -180,6 +180,7 @@
         (m) => m.startSqr === move.startSqr && m.targetSqr === move.targetSqr
       );
       if (move.promotion) {
+        store_moveOptions.set([]);
         promotion = {
           isPromoting: true,
           positionIndex: move.targetSqr,
