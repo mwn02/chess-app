@@ -74,7 +74,7 @@
     grid-template-rows: repeat(4, 1fr);
     grid-template-columns: 1fr;
     background-color: brown;
-    z-index: 3;
+    z-index: 7;
   }
 
   .promotion-piece {
