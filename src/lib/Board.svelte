@@ -44,7 +44,7 @@
 
 <style>
   #board {
-    height: 80vh;
-    aspect-ratio: 1 / 1;
+    height: min(90vh, 90vw);
+    width: min(90vh, 90vw);
   }
 </style>
