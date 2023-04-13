@@ -36,6 +36,8 @@ export let store_gameState: Writable<gameState> = writable({
   state: "play",
   reason: "none",
 });
+export let store_cpuMoveSpeed: Writable<number> = writable(200);
+export let boardOrigin: number[] = [0, 0];
 
 let charToPiece = {
   k: KING,
@@ -48,12 +50,19 @@ let charToPiece = {
 
 export let mainBoardState: BoardState;
 
+export type gameMode = "pvp" | "pvc" | "cvc";
+let gameMode: gameMode = "pvp";
+export function setGameMode(_gameMode: gameMode) {
+  gameMode = _gameMode;
+}
+let isPlayerWhite: boolean;
+
 export function init(boardSize: number, origin: number[]) {
   updateAndGenerateSqrPositions(boardSize, origin);
   loadBoard();
 }
 
-export function loadBoard() {
+export function loadBoard(position?: string, isTurnToWhite?: boolean) {
   mainBoardState = new BoardState();
   mainBoardState.enPassant = {
     isPossible: false,
@@ -62,10 +71,18 @@ export function loadBoard() {
   mainBoardState.tripleRep = [];
   mainBoardState.fiftyMove = 0;
 
-  loadFEN(INITIAL_POSITION, mainBoardState);
+  loadFEN(position || INITIAL_POSITION, mainBoardState);
+  if (isTurnToWhite !== undefined) {
+    isPlayerWhite = isTurnToWhite;
+    mainBoardState.isTurnToWhite = isTurnToWhite;
+    console.log(isTurnToWhite);
+  }
+
   previousMove.set(null);
+
   generateNumSqrsToEdge();
   generateIndexToVector();
+
   let [gameState, moves] = generateMoves(mainBoardState);
   updateMovesAndGameState(gameState, moves);
   store_sqrValues.set(converNumArrayToSqrValues(mainBoardState.sqrValues));
@@ -75,6 +92,7 @@ export function updateAndGenerateSqrPositions(
   boardSize: number,
   origin: number[]
 ) {
+  boardOrigin = origin;
   store_sqrSize.set(boardSize / 8);
   generateSqrPositions(origin);
 }
@@ -87,7 +105,12 @@ export function newTurn(
   if (generateNewMoves) {
     let [gameState, moves] = generateMoves(boardState);
     updateMovesAndGameState(gameState, moves);
-    if (!boardState.isTurnToWhite) makeMove(computer.playMove(boardState));
+    if (gameMode !== "pvp") {
+      if (gameMode === "cvc" || boardState.isTurnToWhite !== isPlayerWhite)
+        setTimeout(() => {
+          makeMove(computer.playMove(boardState));
+        }, get(store_cpuMoveSpeed));
+    }
   }
 }
 

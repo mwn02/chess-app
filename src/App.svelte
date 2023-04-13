@@ -1,13 +1,18 @@
 <script lang="ts">
   import { loadBoard, store_gameState } from "./board";
   import Board from "./lib/Board.svelte";
+  import PlayOptions from "./lib/PlayOptions.svelte";
 </script>
 
-<main>
+<main id="main">
   <Board />
-  {#if $store_gameState.state !== "play"}
-    <div id="checkmate">{$store_gameState.reason.toUpperCase()}!</div>
-    <button on:click={() => loadBoard()}> reset </button>
+  {#if $store_gameState.state === "play"}
+    <PlayOptions />
+  {:else}
+    <div id="checkmate">
+      {$store_gameState.reason.toUpperCase()}!
+      <button on:click={() => loadBoard()}> reset </button>
+    </div>
   {/if}
 </main>
 <svelte:window on:contextmenu|preventDefault />
@@ -28,5 +33,13 @@
   #checkmate {
     z-index: 20;
     font-size: 100px;
+  }
+
+  #main {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+    align-items: stretch center;
   }
 </style>
