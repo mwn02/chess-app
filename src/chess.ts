@@ -1,5 +1,5 @@
 import { get } from "svelte/store";
-import { store_sqrSize, type sqrValue } from "./board";
+import { store_sqrSize, type sqrValue, boardOrigin } from "./board";
 
 export const NULL = 0;
 export const KING = 1;
@@ -33,8 +33,8 @@ export function isSqrOutOfBound(sqr: number): boolean {
 }
 
 export function getHoveredSqrIndex(x: number, y: number): number {
-  let indexY = Math.floor(y / get(store_sqrSize));
-  let indexX = Math.floor(x / get(store_sqrSize));
+  let indexY = Math.floor((y - boardOrigin[1]) / get(store_sqrSize));
+  let indexX = Math.floor((x - boardOrigin[0]) / get(store_sqrSize));
   let index = indexY * 8 + indexX;
   return indexY > 7 || indexY < 0 || indexX > 7 || indexX < 0 ? -1 : index;
 }
