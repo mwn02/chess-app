@@ -36,8 +36,6 @@
 
   $: setPosition(myIndex, $store_sqrPositions);
   $: setSize($store_sqrSize);
-  // $: console.log("X" + pieceDiv?.getBoundingClientRect().x);
-  // $: console.log("left" + pieceDiv?.getBoundingClientRect().left);
 
   let promotion: {
     isPromoting: boolean;
@@ -82,6 +80,8 @@
     let pieceStr = pieceTypeToStr[pieceType];
 
     fileName = colorStr + pieceStr;
+
+    if (!pieceStr) return;
 
     setSize($store_sqrSize);
     setPosition(myIndex);
