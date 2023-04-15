@@ -36,6 +36,8 @@
 
   $: setPosition(myIndex, $store_sqrPositions);
   $: setSize($store_sqrSize);
+  // $: console.log("X" + pieceDiv?.getBoundingClientRect().x);
+  // $: console.log("left" + pieceDiv?.getBoundingClientRect().left);
 
   let promotion: {
     isPromoting: boolean;
@@ -104,15 +106,14 @@
     isSelected = true;
     selectionCount++;
 
-    pieceDiv.style.left = `${e.clientX - $store_sqrSize / 2}px`;
-    pieceDiv.style.top = `${e.clientY - $store_sqrSize / 2}px`;
+    setPosToMousePos(e);
     pieceDiv.style.cursor = "grabbing";
     pieceDiv.style.zIndex = "10";
     store_moveOptions.set(moves.filter((m) => m.startSqr === myIndex));
   }
 
-  function handlePieceMouseUp(e: MouseEvent) {
-    let targetSqr = getHoveredSqrIndex(e.clientX, e.clientY);
+  function handlePieceMouseUp() {
+    let targetSqr = getHoveredSqrIndex();
 
     if (targetSqr === myIndex && selectionCount > 1) {
       isSelected = false;
@@ -124,19 +125,18 @@
 
   function handleWindowMouseMove(e: MouseEvent) {
     if (isMoving) {
-      pieceDiv.style.left = `${e.clientX - $store_sqrSize / 2}px`;
-      pieceDiv.style.top = `${e.clientY - $store_sqrSize / 2}px`;
+      setPosToMousePos(e);
     }
   }
 
-  function handleWindowMouseUp(e: MouseEvent) {
+  function handleWindowMouseUp() {
     pieceDiv.style.zIndex = "0";
     if (!isMoving) return;
 
     isMoving = false;
     pieceDiv.style.cursor = "grab";
 
-    let targetSqr = getHoveredSqrIndex(e.clientX, e.clientY);
+    let targetSqr = getHoveredSqrIndex();
     let move: move = { startSqr: myIndex, targetSqr };
     attemptMakeMove(move);
   }
@@ -149,7 +149,7 @@
       return;
     }
 
-    let targetSqr = getHoveredSqrIndex(e.clientX, e.clientY);
+    let targetSqr = getHoveredSqrIndex();
     if (targetSqr === myIndex) {
       handlePieceMouseDown(e);
       return;
@@ -224,9 +224,15 @@
     promotion.isPromoting = false;
     myIndex = promotion.moves[0].startSqr;
   }
+
+  function setPosToMousePos(e: MouseEvent) {
+    pieceDiv.style.left = `${e.pageX - $store_sqrSize / 2}px`;
+    pieceDiv.style.top = `${e.pageY - $store_sqrSize / 2}px`;
+  }
 </script>
 
 <svelte:window
+  on:wheel={handleWindowMouseMove}
   on:mouseup={handleWindowMouseUp}
   on:mousemove={handleWindowMouseMove}
   on:mousedown={handleWindowMouseDown}

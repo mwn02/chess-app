@@ -92,7 +92,7 @@ export function updateAndGenerateSqrPositions(
   boardSize: number,
   origin: number[]
 ) {
-  boardOrigin = origin;
+  boardOrigin = [origin[0] + window.scrollX, origin[1] + window.scrollY];
   store_sqrSize.set(boardSize / 8);
   generateSqrPositions(origin);
 }
@@ -124,8 +124,8 @@ export function generateSqrPositions(origin: number[]) {
   for (let top = 0; top < 8; top++) {
     for (let left = 0; left < 8; left++) {
       let pos: [number, number] = [
-        origin[0] + left * get(store_sqrSize),
-        origin[1] + top * get(store_sqrSize),
+        origin[0] + left * get(store_sqrSize) + window.scrollX,
+        origin[1] + top * get(store_sqrSize) + window.scrollY,
       ];
       sqrPoses.push(pos);
     }

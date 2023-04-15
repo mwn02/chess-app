@@ -32,9 +32,17 @@ export function isSqrOutOfBound(sqr: number): boolean {
   return sqr < 0 || sqr > 63;
 }
 
-export function getHoveredSqrIndex(x: number, y: number): number {
-  let indexY = Math.floor((y - boardOrigin[1]) / get(store_sqrSize));
-  let indexX = Math.floor((x - boardOrigin[0]) / get(store_sqrSize));
+let pageX: number = 0;
+let pageY: number = 0;
+document.onmousemove = (e: MouseEvent) => {
+  pageX = e.pageX;
+  pageY = e.pageY;
+};
+
+export function getHoveredSqrIndex(): number {
+  let indexX = Math.floor((pageX - boardOrigin[0]) / get(store_sqrSize));
+  let indexY = Math.floor((pageY - boardOrigin[1]) / get(store_sqrSize));
+
   let index = indexY * 8 + indexX;
   return indexY > 7 || indexY < 0 || indexX > 7 || indexX < 0 ? -1 : index;
 }

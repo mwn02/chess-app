@@ -3,10 +3,9 @@
   import { getHoveredSqrIndex, isSqrOutOfBound } from "../chess";
   import { indexToVector } from "../move";
 
-  let mousePos: { x: number; y: number } = { x: 0, y: 0 };
   let isMouseDown: boolean = false;
 
-  $: hoveredSqr = getHoveredSqrIndex(mousePos.x, mousePos.y);
+  let hoveredSqr = getHoveredSqrIndex();
   $: maskSize = $store_sqrSize / 1.15;
   $: color = isSqrOutOfBound(hoveredSqr)
     ? "dark"
@@ -14,21 +13,15 @@
     ? "dark"
     : "light";
 
-  function handleMouseMove(e: MouseEvent) {
-    mousePos.x = e.clientX;
-    mousePos.y = e.clientY;
-  }
-
   function handleWindowMouseDown() {
-    const hoverSqr = getHoveredSqrIndex(mousePos.x, mousePos.y);
-    if (!isSqrOutOfBound(hoverSqr))
-      if ($store_sqrValues[hoverSqr].value) isMouseDown = true;
+    if (!isSqrOutOfBound(hoveredSqr))
+      if ($store_sqrValues[hoveredSqr].value) isMouseDown = true;
   }
 </script>
 
 <svelte:window
-  on:mousemove={handleMouseMove}
-  on:mousedown={() => handleWindowMouseDown}
+  on:mousemove={() => (hoveredSqr = getHoveredSqrIndex())}
+  on:mousedown={handleWindowMouseDown}
   on:mouseup={() => (isMouseDown = false)}
 />
 {#if isMouseDown && !isSqrOutOfBound(hoveredSqr)}

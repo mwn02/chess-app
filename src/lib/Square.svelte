@@ -33,8 +33,8 @@
     sqrDiv.style.height = `${$store_sqrSize}px`;
   }
 
-  function handleWindowContextMenu(e: MouseEvent) {
-    const targetSqr = getHoveredSqrIndex(e.x, e.y);
+  function handleWindowContextMenu() {
+    const targetSqr = getHoveredSqrIndex();
     if (targetSqr !== index) return;
 
     isHighlighted = !isHighlighted;

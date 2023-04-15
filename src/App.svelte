@@ -26,10 +26,6 @@
   10: DraggedPiece
  -->
 <style>
-  :root {
-    overflow: hidden;
-  }
-
   #checkmate {
     z-index: 20;
     font-size: 100px;
