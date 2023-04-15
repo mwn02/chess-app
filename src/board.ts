@@ -51,11 +51,11 @@ let charToPiece = {
 export let mainBoardState: BoardState;
 
 export type gameMode = "pvp" | "pvc" | "cvc";
-let gameMode: gameMode = "pvp";
+export let boardGameMode: gameMode = "pvp";
 export function setGameMode(_gameMode: gameMode) {
-  gameMode = _gameMode;
+  boardGameMode = _gameMode;
 }
-let isPlayerWhite: boolean;
+export let isPlayerWhite: boolean;
 
 export function init(boardSize: number, origin: number[]) {
   updateAndGenerateSqrPositions(boardSize, origin);
@@ -72,19 +72,14 @@ export function loadBoard(position?: string, isTurnToWhite?: boolean) {
   mainBoardState.fiftyMove = 0;
 
   loadFEN(position || INITIAL_POSITION, mainBoardState);
-  if (isTurnToWhite !== undefined) {
-    isPlayerWhite = isTurnToWhite;
-    mainBoardState.isTurnToWhite = isTurnToWhite;
-    console.log(isTurnToWhite);
-  }
+  if (isTurnToWhite !== undefined) isPlayerWhite = isTurnToWhite;
 
   previousMove.set(null);
 
   generateNumSqrsToEdge();
   generateIndexToVector();
 
-  let [gameState, moves] = generateMoves(mainBoardState);
-  updateMovesAndGameState(gameState, moves);
+  newTurn(true, mainBoardState);
   store_sqrValues.set(converNumArrayToSqrValues(mainBoardState.sqrValues));
 }
 
@@ -102,13 +97,15 @@ export function newTurn(
   boardState: BoardState
 ) {
   boardState.isTurnToWhite = !boardState.isTurnToWhite;
+
   if (generateNewMoves) {
     let [gameState, moves] = generateMoves(boardState);
     updateMovesAndGameState(gameState, moves);
-    if (gameMode !== "pvp") {
-      if (gameMode === "cvc" || boardState.isTurnToWhite !== isPlayerWhite)
+    if (boardGameMode !== "pvp") {
+      if (boardGameMode === "cvc" || boardState.isTurnToWhite !== isPlayerWhite)
         setTimeout(() => {
-          makeMove(computer.playMove(boardState));
+          let move = computer.playMove(boardState);
+          if (move) makeMove(move);
         }, get(store_cpuMoveSpeed));
     }
   }
@@ -138,7 +135,7 @@ export function loadFEN(fen: string, boardState: BoardState) {
   boardState.sqrValues = new Array(64).fill(NULL);
   let fenPieces = fen.split(" ")[0];
 
-  let isTurnToWhite = fen.split(" ")[1] === "w";
+  let isTurnToWhite = fen.split(" ")[1] !== "w";
   boardState.isTurnToWhite = isTurnToWhite;
 
   let castling = fen.split(" ")[2];

@@ -4,10 +4,13 @@
     type gameMode,
     setGameMode,
     store_cpuMoveSpeed,
+    boardGameMode,
+    isPlayerWhite,
   } from "../board";
 
-  let gameMode: gameMode = "pvp";
-  let playWithWhite: boolean = true;
+  let gameMode: gameMode = boardGameMode;
+  let playWithWhite: boolean =
+    isPlayerWhite !== undefined ? isPlayerWhite : true;
   let cpuMoveSpeed: number = 100;
   $: store_cpuMoveSpeed.set(cpuMoveSpeed);
 
