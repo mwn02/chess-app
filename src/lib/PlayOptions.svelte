@@ -52,6 +52,16 @@
     font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
   }
 
+  label {
+    font-size: 2rem;
+  }
+
+  option,
+  select,
+  button {
+    font-size: 1rem;
+  }
+
   #player-options {
     padding: 20px;
     background-color: cyan;
