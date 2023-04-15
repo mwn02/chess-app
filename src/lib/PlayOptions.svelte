@@ -34,7 +34,7 @@
     />Play as white</label
   >
 
-  <button type="submit">Play</button>
+  <button id="submit" type="submit">Play</button>
   {#if gameMode === "cvc"}
     <input
       type="range"
@@ -49,7 +49,8 @@
 
 <style>
   :root {
-    font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
+    font-family: "Outfit", sans-serif;
+    --color-grey: rgb(73, 73, 73);
   }
 
   label {
@@ -60,14 +61,25 @@
   select,
   button {
     font-size: 1rem;
+    border-radius: 0.5rem;
+    border: 2px solid var(--color-grey);
+    font-family: "Outfit", sans-serif;
   }
 
   #player-options {
     padding: 20px;
-    background-color: cyan;
+    background-color: rgb(255, 226, 79);
+    border-radius: 1rem;
+    border: 0.5rem solid var(--color-grey);
 
     display: flex;
     flex-direction: column;
     gap: 0.8rem;
+  }
+
+  #submit {
+    background-color: rgb(204, 108, 255);
+    aspect-ratio: 1 / 0.3;
+    font-size: 1.5rem;
   }
 </style>
