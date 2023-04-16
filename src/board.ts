@@ -79,8 +79,32 @@ export function loadBoard(position?: string, isTurnToWhite?: boolean) {
   generateNumSqrsToEdge();
   generateIndexToVector();
 
-  newTurn(true, mainBoardState);
-  store_sqrValues.set(converNumArrayToSqrValues(mainBoardState.sqrValues));
+  let test: boolean = false;
+
+  if (test) {
+    mainBoardState.isTurnToWhite = false;
+    console.log(posTest(1));
+  } else {
+    newTurn(true, mainBoardState);
+    store_sqrValues.set(converNumArrayToSqrValues(mainBoardState.sqrValues));
+  }
+}
+
+function posTest(depth: number): number {
+  if (depth === 0) return 1;
+
+  let numPosition: number = 0;
+
+  let [, moves] = generateMoves(mainBoardState);
+  let sqrValues = structuredClone(mainBoardState.sqrValues);
+
+  moves.forEach((move) => {
+    makeMove(move, mainBoardState);
+    numPosition += posTest(depth - 1);
+    mainBoardState.sqrValues = structuredClone(sqrValues);
+  });
+
+  return numPosition;
 }
 
 export function updateAndGenerateSqrPositions(
