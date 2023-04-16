@@ -86,7 +86,7 @@
     setSize($store_sqrSize);
     setPosition(myIndex);
 
-    pieceDiv.style.backgroundImage = `url(/chess_pieces/${fileName}.svg)`;
+    pieceDiv.style.backgroundImage = `url(./chess_pieces/${fileName}.svg)`;
   }
 
   function setSize($store_sqrSize: number) {
